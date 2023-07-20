@@ -26,13 +26,15 @@ const app = express();
 //   next();
 // });
 
-const corsOptions = {
-  origin: ["https://tivan-collector.vercel.app", "http://localhost:5173"],
-  methods: ["GET", "POST", "PUT", "DELETE"],
-  allowedHeaders: ["Origin", "X-Requested-With", "Content-Type", "Accept"],
-};
+// const corsOptions = {
+//   origin: ["https://tivan-collector.vercel.app", "http://localhost:5173"],
+//   methods: ["GET", "POST", "PUT", "DELETE"],
+//   allowedHeaders: ["Origin", "X-Requested-With", "Content-Type", "Accept"],
+// };
 
-app.use(cors(corsOptions));
+// app.use(cors(corsOptions));
+
+app.use(cors());
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));

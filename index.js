@@ -4,6 +4,8 @@ const cookieParser = require("cookie-parser");
 const cors = require("cors");
 
 const userRoutes = require("./src/routes/userRoutes");
+const collectionRoutes = require("./src/routes/collectionRoutes");
+const itemRoutes = require("./src/routes/itemRoutes");
 const { notFound, errorHandler } = require("./src/middlewares/errorMiddleware");
 
 const { connectDB } = require("./src/config/db");
@@ -12,28 +14,6 @@ connectDB();
 
 const app = express();
 
-// app.use((req, res, next) => {
-//   res.header(
-//     "Access-Control-Allow-Origin",
-//     "http://localhost:5173",
-//     "https://tivan-collector.vercel.app"
-//   );
-//   res.header(
-//     "Access-Control-Allow-Headers",
-//     "Origin, X-Requested-With, Content-Type, Accept"
-//   );
-//   res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE");
-//   next();
-// });
-
-// const corsOptions = {
-//   origin: ["https://tivan-collector.vercel.app", "http://localhost:5173"],
-//   methods: ["GET", "POST", "PUT", "DELETE"],
-//   allowedHeaders: ["Origin", "X-Requested-With", "Content-Type", "Accept"],
-// };
-
-// app.use(cors(corsOptions));
-
 app.use(cors());
 
 app.use(express.json());
@@ -41,6 +21,8 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
 app.use("/api/users", userRoutes);
+app.use("/api/collections", collectionRoutes);
+app.use("/api/collections", itemRoutes);
 
 const PORT = process.env.PORT || 5000;
 

@@ -7,14 +7,11 @@ const jwt = require("jsonwebtoken");
 const createCollection = asyncHandler(async (req, res) => {
   const { collectionName, collectionDescription, collectionTopic } = req.body;
 
-  // Retrieve the JWT token from the cookies
   let token = req.cookies.jwt;
 
-  // Verify the JWT token and extract the userId
   const decoded = jwt.verify(token, process.env.JWT_SECRET);
   const userId = decoded.userId;
 
-  // Find the user in the database using the extracted userId
   const user = await User.findById(userId);
 
   if (!user) {
@@ -22,10 +19,8 @@ const createCollection = asyncHandler(async (req, res) => {
     throw new Error("User not found.");
   }
 
-  // Use the user's name as the collectionAuthor
   const collectionAuthor = user;
 
-  // Create the collection using the received data
   const collection = await Collection.create({
     collectionName,
     collectionAuthor,
@@ -60,7 +55,74 @@ const getUserCollection = asyncHandler(async (req, res) => {
   res.status(200).json(collections);
 });
 
+const getLargestCollection = asyncHandler(async (req, res) => {
+  try {
+    const collectionsWithItems = await Collection.aggregate([
+      // Filter collections with non-empty 'collectionItems' array
+      {
+        $match: {
+          collectionItems: { $exists: true, $not: { $size: 0 } },
+        },
+      },
+      // Add a new field 'numCollectionItems' to each document containing the count of 'collectionItems'
+      {
+        $addFields: {
+          numCollectionItems: { $size: "$collectionItems" },
+        },
+      },
+      // Sort the documents in descending order based on 'numCollectionItems'
+      {
+        $sort: {
+          numCollectionItems: -1,
+        },
+      },
+      // Limit the result to the top 5 collections
+      {
+        $limit: 5,
+      },
+    ]);
+
+    res.status(200).json(collectionsWithItems);
+  } catch (error) {
+    console.error("Error fetching largest collections:", error);
+    res.status(500).json({ message: "Error fetching largest collections" });
+  }
+});
+
+const getLatestItems = asyncHandler(async (req, res) => {
+  try {
+    const latestItems = await Collection.aggregate([
+      { $unwind: "$collectionItems" },
+      { $sort: { "collectionItems.createdAt": -1 } },
+      { $limit: 6 },
+      {
+        $project: {
+          _id: "$collectionItems._id",
+          collectionName: "$collectionName",
+          collectionTopic: 1,
+          collectionDescription: 1,
+          collectionAuthor: 1,
+          itemDescription: "$collectionItems.itemDescription",
+          itemName: "$collectionItems.itemName",
+          createdAt: "$collectionItems.createdAt",
+          updatedAt: "$collectionItems.updatedAt",
+        },
+      },
+    ]);
+    for (const item of latestItems) {
+      const authorId = item.collectionAuthor;
+      const user = await User.findById(authorId);
+      item.collectionAuthor = user.name;
+    }
+    res.json(latestItems);
+  } catch (error) {
+    res.status(500).json({ error: "Error fetching latest items." });
+  }
+});
+
 module.exports = {
   createCollection,
   getUserCollection,
+  getLargestCollection,
+  getLatestItems,
 };

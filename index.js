@@ -13,12 +13,29 @@ const { connectDB } = require("./src/config/db");
 connectDB();
 
 const app = express();
+app.use(cookieParser());
 
-app.use(cors());
+app.use(cors({ credentials: true }));
+
+app.use((req, res, next) => {
+  const allowedOrigins = [
+    "https://tivan-collector.vercel.app",
+    "http://localhost:5173",
+  ];
+
+  const origin = req.headers.origin;
+  if (allowedOrigins.includes(origin)) {
+    res.setHeader("Access-Control-Allow-Origin", origin);
+  }
+
+  res.setHeader("Access-Control-Allow-Credentials", "true");
+  res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  next();
+});
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(cookieParser());
 
 app.use("/api/users", userRoutes);
 app.use("/api/collections", collectionRoutes);

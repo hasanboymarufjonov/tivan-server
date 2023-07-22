@@ -19,9 +19,7 @@ const collectionSchema = mongoose.Schema(
       type: String,
       required: true,
     },
-    // collectionItems: {
-    //   type: Object,
-    // },
+
     collectionItems: [
       {
         itemName: {
@@ -31,6 +29,14 @@ const collectionSchema = mongoose.Schema(
         itemDescription: {
           type: String,
           required: true,
+        },
+        createdAt: {
+          type: Date,
+          default: Date.now,
+        },
+        updatedAt: {
+          type: Date,
+          default: Date.now,
         },
       },
     ],

@@ -25,23 +25,23 @@ app.use(
 
 app.set("trust proxy", 1);
 
-app.use((req, res, next) => {
-  const allowedOrigins = [
-    "https://tivan-collector.vercel.app",
-    "http://localhost:5173",
-  ];
+// app.use((req, res, next) => {
+//   const allowedOrigins = [
+//     "https://tivan-collector.vercel.app",
+//     "http://localhost:5173",
+//   ];
 
-  const origin = req.headers.origin;
-  if (allowedOrigins.includes(origin)) {
-    res.setHeader("Access-Control-Allow-Origin", origin);
-  }
+//   const origin = req.headers.origin;
+//   if (allowedOrigins.includes(origin)) {
+//     res.setHeader("Access-Control-Allow-Origin", origin);
+//   }
 
-  res.setHeader("Access-Control-Allow-Credentials", "true");
-  res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE");
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+//   res.setHeader("Access-Control-Allow-Credentials", "true");
+//   res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE");
+//   res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
 
-  next();
-});
+//   next();
+// });
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));

@@ -76,9 +76,9 @@ const getLargestCollection = asyncHandler(async (req, res) => {
           numCollectionItems: -1,
         },
       },
-      // Limit the result to the top 5 collections
+      // Limit the result to the top 6 collections
       {
-        $limit: 5,
+        $limit: 6,
       },
     ]);
 

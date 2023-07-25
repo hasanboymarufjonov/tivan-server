@@ -9,7 +9,13 @@ const authUser = asyncHandler(async (req, res) => {
 
   if (user && (await user.matchPassword(password))) {
     generateToken(res, user._id);
-    res.status(201).json({ _id: user._id, name: user.name, email: user.email });
+    res.status(201).json({
+      _id: user._id,
+      name: user.name,
+      email: user.email,
+      role: user.role,
+      status: user.status,
+    });
   } else {
     res.status(401);
     throw new Error("Invalid email or password");
@@ -33,7 +39,13 @@ const registerUser = asyncHandler(async (req, res) => {
 
   if (user) {
     generateToken(res, user._id);
-    res.status(201).json({ _id: user._id, name: user.name, email: user.email });
+    res.status(201).json({
+      _id: user._id,
+      name: user.name,
+      email: user.email,
+      role: user.role,
+      status: user.status,
+    });
   } else {
     res.status(400);
     throw new Error("Invalid user data");
@@ -82,10 +94,77 @@ const updateUserProfile = asyncHandler(async (req, res) => {
   }
 });
 
+const getAllUsers = asyncHandler(async (req, res) => {
+  try {
+    const users = await User.find();
+    res.json(users);
+  } catch (error) {
+    res.status(500).json({ error: "Error fetching users." });
+  }
+});
+
+const updateUserRole = asyncHandler(async (req, res) => {
+  const { userId } = req.params;
+  const { role } = req.body;
+
+  try {
+    const user = await User.findByIdAndUpdate(userId, { role }, { new: true });
+
+    if (!user) {
+      return res.status(404).json({ error: "User not found." });
+    }
+
+    res.json(user);
+  } catch (error) {
+    res.status(500).json({ error: "Error updating user role." });
+  }
+});
+
+const updateUserStatus = asyncHandler(async (req, res) => {
+  const { userId } = req.params;
+  const { status } = req.body;
+
+  try {
+    const user = await User.findByIdAndUpdate(
+      userId,
+      { status },
+      { new: true }
+    );
+
+    if (!user) {
+      return res.status(404).json({ error: "User not found." });
+    }
+
+    res.json(user);
+  } catch (error) {
+    res.status(500).json({ error: "Error updating user role." });
+  }
+});
+
+const deleteUser = async (req, res) => {
+  const { userId } = req.params;
+
+  try {
+    const deletedUser = await User.findByIdAndDelete(userId);
+
+    if (!deletedUser) {
+      return res.status(404).json({ error: "User not found." });
+    }
+
+    res.json(deletedUser);
+  } catch (error) {
+    res.status(500).json({ error: "Error deleting user." });
+  }
+};
+
 module.exports = {
   authUser,
   registerUser,
   logoutUser,
   getUserProfile,
   updateUserProfile,
+  getAllUsers,
+  updateUserRole,
+  updateUserStatus,
+  deleteUser,
 };
